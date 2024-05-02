@@ -1,13 +1,14 @@
-import numpy as np
 import pytest
+import yfinance as yf
 from stock_analysis.performance_metrics import sharpe_ratio
 
-@pytest.fixture
-def sample_stock_returns():
-    """Sample stock returns for testing."""
-    return np.random.normal(loc=0.001, scale=0.02, size=100)
 
-def test_sharpe_ratio(sample_stock_returns):
-    """Test sharpe_ratio function."""
-    ratio = sharpe_ratio(sample_stock_returns)
+@pytest.fixture(scope="module")
+def stock_returns():
+    data = yf.download('AAPL', start='2021-01-01', end='2021-12-31')
+    return data['Adj Close'].pct_change().dropna()
+
+
+def test_sharpe_ratio(stock_returns):
+    ratio = sharpe_ratio(stock_returns)
     assert isinstance(ratio, float)
